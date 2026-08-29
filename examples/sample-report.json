@@ -1,0 +1,41 @@
+{
+  "config": {
+    "attempts": 5,
+    "base_delay": 1.0,
+    "factor": 2.0,
+    "cap": 30.0,
+    "jitter": 0.2,
+    "success_prob": 0.65,
+    "concurrency": 20,
+    "timeout": 10.0
+  },
+  "report": {
+    "expected_requests_per_job": 1.5304,
+    "success_probability": 0.994748,
+    "worst_case_requests_per_job": 5,
+    "max_concurrent_requests_if_all_retry": 100,
+    "worst_case_job_seconds": 68.0,
+    "delay_schedule": [
+      {
+        "attempt": 1,
+        "delay_before": 0.0
+      },
+      {
+        "attempt": 2,
+        "delay_before": 1.2
+      },
+      {
+        "attempt": 3,
+        "delay_before": 2.4
+      },
+      {
+        "attempt": 4,
+        "delay_before": 4.8
+      },
+      {
+        "attempt": 5,
+        "delay_before": 9.6
+      }
+    ]
+  }
+}
