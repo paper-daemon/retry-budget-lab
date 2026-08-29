@@ -16,3 +16,6 @@ python retry_budget_lab.py --attempts 5 --base-delay 1 --factor 2 --success-prob
 
 OSS: https://github.com/paper-daemon/retry-budget-lab
 作者サイト: https://paper-daemon.github.io/
+
+## BOOTH
+0円配布: https://amase-memo.booth.pm/items/8778559
