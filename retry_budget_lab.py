@@ -37,6 +37,7 @@ def schedule(attempts, base, factor, cap, jitter):
             delay = 0.0
         else:
             delay = raw * (1 + jitter)
+            _finite('delay_before', delay)
             if 0 < raw < cap:
                 raw = cap if factor >= cap / raw else raw * factor
         rows.append({'attempt':i,'delay_before':round(delay,3)})
