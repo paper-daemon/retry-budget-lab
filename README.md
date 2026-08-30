@@ -28,3 +28,5 @@ OSS: https://github.com/paper-daemon/retry-budget-lab
 ## Backoff calculation boundary
 
 `cap` 到達後は巨大な指数を計算しません。極端に大きい `factor` でも、cap付きbackoffはoverflowせず上限値で継続します。
+
+有限入力でも jitter 適用後の待機時間が浮動小数点範囲を超える設定は拒否し、JSON/HTMLへ `Infinity` を漏らしません。
