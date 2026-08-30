@@ -10,3 +10,15 @@ class T(unittest.TestCase):
         self.assertAlmostEqual(m['success_probability'],.875)
         r=analyze(3,1,2,30,0,.5,10,5)
         self.assertEqual(r['max_concurrent_requests_if_all_retry'],30)
+
+    def test_invalid_policy_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'attempts'):
+            analyze(0,1,2,30,0,.5,10,5)
+        with self.assertRaisesRegex(ValueError, 'jitter'):
+            analyze(3,1,2,30,-.1,.5,10,5)
+        with self.assertRaisesRegex(ValueError, 'success_prob'):
+            analyze(3,1,2,30,0,1.2,10,5)
+        with self.assertRaisesRegex(ValueError, 'timeout'):
+            analyze(3,1,2,30,0,.5,10,-1)
+        with self.assertRaisesRegex(ValueError, 'concurrency'):
+            analyze(3,1,2,30,0,.5,0,5)
