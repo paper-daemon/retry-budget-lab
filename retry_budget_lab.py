@@ -31,12 +31,14 @@ def validate_probability(attempts, success_prob):
 def schedule(attempts, base, factor, cap, jitter):
     validate_schedule(attempts, base, factor, cap, jitter)
     rows=[]
+    raw=min(cap, base)
     for i in range(1, attempts+1):
         if i == 1:
             delay = 0.0
         else:
-            raw = min(cap, base * (factor ** (i-2)))
             delay = raw * (1 + jitter)
+            if 0 < raw < cap:
+                raw = cap if factor >= cap / raw else raw * factor
         rows.append({'attempt':i,'delay_before':round(delay,3)})
     return rows
 
