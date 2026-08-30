@@ -62,7 +62,8 @@ def analyze(attempts, base, factor, cap, jitter, success_prob, concurrency, time
     total_delay=sum(x['delay_before'] for x in rows)
     worst_duration=total_delay + attempts*timeout
     m.update({
-        'max_concurrent_requests_if_all_retry':concurrency*attempts,
+        'max_concurrent_requests_if_all_retry':concurrency,
+        'worst_case_requests_for_concurrent_jobs':concurrency*attempts,
         'worst_case_job_seconds':round(worst_duration,3),
         'delay_schedule':rows,
     })
@@ -72,7 +73,7 @@ def render(r, cfg):
     return (
         '<!doctype html><meta charset="utf-8">'
         '<style>body{font:15px system-ui;max-width:950px;margin:auto;padding:40px;background:#f1eadf}'
-        '.hero{font:700 52px serif;color:#a94768}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
+        '.hero{font:700 52px serif;color:#a94768}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}'
         '.cards div{background:#fffaf2;padding:18px;border:1px solid #ded2c4}table{width:100%;border-collapse:collapse;background:#fffaf2}'
         'td,th{padding:10px;border-bottom:1px solid #ddd;text-align:left}</style>'
         '<h1>Retry Budget Lab</h1>'
@@ -80,7 +81,8 @@ def render(r, cfg):
         '<div class="cards">'
         f"<div><b>success by final attempt</b><br>{r['success_probability']:.2%}</div>"
         f"<div><b>worst job time</b><br>{r['worst_case_job_seconds']}s</div>"
-        f"<div><b>max request pressure</b><br>{r['max_concurrent_requests_if_all_retry']}</div></div>"
+        f"<div><b>max simultaneous requests</b><br>{r['max_concurrent_requests_if_all_retry']}</div>"
+        f"<div><b>worst total requests</b><br>{r['worst_case_requests_for_concurrent_jobs']}</div></div>"
         f"<p>policy: {html.escape(str(cfg))}</p>"
         '<table><tr><th>attempt</th><th>delay before</th></tr>'+rows+'</table>'
     )
