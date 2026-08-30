@@ -1,5 +1,6 @@
-import unittest
-from retry_budget_lab import schedule, metrics, analyze
+import tempfile, unittest
+from pathlib import Path
+from retry_budget_lab import schedule, metrics, analyze, validate_output_paths
 
 class T(unittest.TestCase):
     def test_schedule_and_metrics(self):
@@ -39,3 +40,11 @@ class T(unittest.TestCase):
             analyze(3,1,2,30,0,.5,10,-1)
         with self.assertRaisesRegex(ValueError, 'concurrency'):
             analyze(3,1,2,30,0,.5,0,5)
+
+    def test_json_and_html_outputs_must_be_distinct(self):
+        out=Path(tempfile.mktemp())
+        with self.assertRaisesRegex(ValueError, 'different paths'):
+            validate_output_paths(out, out)
+
+    def test_distinct_output_paths_are_allowed(self):
+        validate_output_paths(Path(tempfile.mktemp()), Path(tempfile.mktemp()))
