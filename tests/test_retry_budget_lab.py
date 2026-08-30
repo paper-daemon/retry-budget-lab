@@ -17,6 +17,10 @@ class T(unittest.TestCase):
         self.assertEqual(r['max_concurrent_requests_if_all_retry'],7)
         self.assertEqual(r['worst_case_requests_for_concurrent_jobs'],35)
 
+    def test_jitter_overflow_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'delay_before must be finite'):
+            schedule(2, 1e308, 1, 1e308, 1e308)
+
     def test_cap_prevents_exponential_overflow(self):
         s=schedule(4,1,1e308,30,0)
         self.assertEqual([x['delay_before'] for x in s],[0.0,1,30,30])
