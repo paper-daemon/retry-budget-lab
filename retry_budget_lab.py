@@ -2,7 +2,34 @@
 import argparse, json, math, html
 from pathlib import Path
 
+
+def _finite(name, value):
+    if not math.isfinite(float(value)):
+        raise ValueError(f'{name} must be finite')
+
+def validate_schedule(attempts, base, factor, cap, jitter):
+    if attempts < 1:
+        raise ValueError('attempts must be >= 1')
+    for name, value in (('base', base), ('factor', factor), ('cap', cap), ('jitter', jitter)):
+        _finite(name, value)
+    if base < 0:
+        raise ValueError('base must be >= 0')
+    if factor <= 0:
+        raise ValueError('factor must be > 0')
+    if cap < 0:
+        raise ValueError('cap must be >= 0')
+    if jitter < 0:
+        raise ValueError('jitter must be >= 0')
+
+def validate_probability(attempts, success_prob):
+    if attempts < 1:
+        raise ValueError('attempts must be >= 1')
+    _finite('success_prob', success_prob)
+    if not 0 <= success_prob <= 1:
+        raise ValueError('success_prob must be between 0 and 1')
+
 def schedule(attempts, base, factor, cap, jitter):
+    validate_schedule(attempts, base, factor, cap, jitter)
     rows=[]
     for i in range(1, attempts+1):
         if i == 1:
@@ -14,7 +41,8 @@ def schedule(attempts, base, factor, cap, jitter):
     return rows
 
 def metrics(attempts, success_prob):
-    p=max(0.0,min(1.0,success_prob)); q=1-p
+    validate_probability(attempts, success_prob)
+    p=float(success_prob); q=1-p
     expected=sum(q**i for i in range(attempts))
     success_by_n=1-(q**attempts)
     return {
@@ -24,6 +52,11 @@ def metrics(attempts, success_prob):
     }
 
 def analyze(attempts, base, factor, cap, jitter, success_prob, concurrency, timeout):
+    if concurrency < 1:
+        raise ValueError('concurrency must be >= 1')
+    _finite('timeout', timeout)
+    if timeout < 0:
+        raise ValueError('timeout must be >= 0')
     rows=schedule(attempts,base,factor,cap,jitter)
     m=metrics(attempts,success_prob)
     total_delay=sum(x['delay_before'] for x in rows)
