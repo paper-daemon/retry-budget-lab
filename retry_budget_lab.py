@@ -28,6 +28,12 @@ def validate_probability(attempts, success_prob):
     if not 0 <= success_prob <= 1:
         raise ValueError('success_prob must be between 0 and 1')
 
+def validate_output_paths(json_path, html_path):
+    json_target = Path(json_path).resolve(strict=False)
+    html_target = Path(html_path).resolve(strict=False)
+    if json_target == html_target:
+        raise ValueError(f'json and html outputs must use different paths: {json_target}')
+
 def schedule(attempts, base, factor, cap, jitter):
     validate_schedule(attempts, base, factor, cap, jitter)
     rows=[]
@@ -71,6 +77,7 @@ def analyze(attempts, base, factor, cap, jitter, success_prob, concurrency, time
         'delay_schedule':rows,
     })
     return m
+
 def render(r, cfg):
     rows=''.join(f"<tr><td>{x['attempt']}</td><td>{x['delay_before']}s</td></tr>" for x in r['delay_schedule'])
     return (
@@ -102,7 +109,11 @@ def main():
     ap.add_argument('--timeout',type=float,default=10.0)
     ap.add_argument('--json',default='retry-budget.json'); ap.add_argument('--html',default='retry-budget.html')
     a=ap.parse_args(); cfg=vars(a).copy(); cfg.pop('json'); cfg.pop('html')
-    r=analyze(a.attempts,a.base_delay,a.factor,a.cap,a.jitter,a.success_prob,a.concurrency,a.timeout)
+    try:
+        validate_output_paths(a.json, a.html)
+        r=analyze(a.attempts,a.base_delay,a.factor,a.cap,a.jitter,a.success_prob,a.concurrency,a.timeout)
+    except ValueError as e:
+        ap.error(str(e))
     Path(a.json).write_text(json.dumps({'config':cfg,'report':r},indent=2),encoding='utf-8')
     Path(a.html).write_text(render(r,cfg),encoding='utf-8')
     print(f"amplification={r['expected_requests_per_job']}x success={r['success_probability']:.2%} worst={r['worst_case_job_seconds']}s")
