@@ -8,7 +8,8 @@ python retry_budget_lab.py --attempts 5 --base-delay 1 --factor 2 --success-prob
 
 - exponential backoff / cap / jitter を反映
 - 1ジョブあたりの期待リクエスト数を計算
-- worst-case の処理時間と同時リクエスト圧を表示
+- worst-case の処理時間を表示
+- 瞬間の最大同時request数と、並行job群が全retryした時の総request数を分けて表示
 - HTML + JSON レポート
 - Python 3.10+ / 外部依存なし / MIT
 
@@ -19,3 +20,7 @@ OSS: https://github.com/paper-daemon/retry-budget-lab
 
 ## BOOTH
 0円配布: https://amase-memo.booth.pm/items/8778559
+
+## Request pressure boundary
+
+各jobのretryは逐次なので、瞬間の最大同時request数は `concurrency` を超えません。`concurrency × attempts` は同時数ではなく、並行job群が全attemptを使った時のworst-case総request数として別表示します。
