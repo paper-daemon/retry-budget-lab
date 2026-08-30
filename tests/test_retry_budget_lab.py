@@ -17,6 +17,13 @@ class T(unittest.TestCase):
         self.assertEqual(r['max_concurrent_requests_if_all_retry'],7)
         self.assertEqual(r['worst_case_requests_for_concurrent_jobs'],35)
 
+    def test_cap_prevents_exponential_overflow(self):
+        s=schedule(4,1,1e308,30,0)
+        self.assertEqual([x['delay_before'] for x in s],[0.0,1,30,30])
+        s=schedule(100,1,1e100,30,.2)
+        self.assertEqual(s[1]['delay_before'],1.2)
+        self.assertTrue(all(x['delay_before'] == 36.0 for x in s[2:]))
+
     def test_invalid_policy_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'attempts'):
             analyze(0,1,2,30,0,.5,10,5)
