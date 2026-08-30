@@ -24,3 +24,7 @@ OSS: https://github.com/paper-daemon/retry-budget-lab
 ## Request pressure boundary
 
 各jobのretryは逐次なので、瞬間の最大同時request数は `concurrency` を超えません。`concurrency × attempts` は同時数ではなく、並行job群が全attemptを使った時のworst-case総request数として別表示します。
+
+## Backoff calculation boundary
+
+`cap` 到達後は巨大な指数を計算しません。極端に大きい `factor` でも、cap付きbackoffはoverflowせず上限値で継続します。
