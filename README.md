@@ -30,3 +30,7 @@ OSS: https://github.com/paper-daemon/retry-budget-lab
 `cap` 到達後は巨大な指数を計算しません。極端に大きい `factor` でも、cap付きbackoffはoverflowせず上限値で継続します。
 
 有限入力でも jitter 適用後の待機時間が浮動小数点範囲を超える設定は拒否し、JSON/HTMLへ `Infinity` を漏らしません。
+
+## Report output boundary
+
+`--json` と `--html` は異なる実体pathを指定する必要があります。同一pathを指定した場合はレポートを書き込む前に拒否し、JSON/HTMLの片方が後勝ちで上書きされる事故を防ぎます。
